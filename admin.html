@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="admin-wrapper">
+      <h1>users account</h1>
+      <table>
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Facebook</th>
+          <th>Payment Tag</th>
+          <th>Password</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Game Show</th>
+        </tr>
+        <tr></tr>
+      </table>
+
+      <div class="update-btn">Update</div>
+    </div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js";
+      import {
+        doc,
+        setDoc,
+      } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js";
+
+      import {
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js";
+
+      import { runTransaction } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        onValue,
+        child,
+        get,
+        update,
+        push,
+        remove,
+      } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyALhpkKJ1KAl6QLbTtiPbdDTNCStJoSJ78",
+        authDomain: "sweepstake-39233.firebaseapp.com",
+        databaseURL:
+          "https://sweepstake-39233-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "sweepstake-39233",
+        storageBucket: "sweepstake-39233.appspot.com",
+        messagingSenderId: "215859321999",
+        appId: "1:215859321999:web:0e468395e3de718ccce4fa",
+        measurementId: "G-3LFDCFRNY9",
+      };
+      const app = initializeApp(firebaseConfig);
+      const table = document.querySelector("table");
+      const db = getDatabase();
+      const dbRef = ref(getDatabase());
+      let array = [];
+      let accounts = [];
+
+      const starCountRef = ref(db, "winwin/");
+      onValue(starCountRef, (snapshot) => {
+        const data = snapshot.val();
+        accounts = Object.keys(data).map(function (key) {
+          return snapshot.val()[key];
+        });
+        accounts.map((item) => {
+          renderRow(item);
+        });
+      });
+      function getParent(element, selector) {
+        while (element.parentElement) {
+          if (element.parentElement.matches(selector)) {
+            return element.parentElement;
+          } else {
+            element = element.parentElement;
+          }
+        }
+      }
+      const getDel = () => {
+        const delBtn = document.querySelectorAll(".del");
+        console.log(delBtn);
+        Array.from(delBtn).map((item) => {
+          const row = getParent(item, "tr");
+          console.log(row);
+          item.onclick = () => {
+            row.remove();
+          };
+        });
+      };
+      const renderRow = (obj) => {
+        const html = `
+            <tr> 
+              <td contenteditable="true"> ${obj.firstName} </td>
+              <td contenteditable="true">${obj.lastName} </td>
+              <td contenteditable="true">${obj.fbLink} </td>
+              <td contenteditable="true">${obj.paymentTag} </td>
+              <td contenteditable="true">${obj.pass} </td>
+              <td>${obj.email} </td>  
+              <td contenteditable="true">${obj.phoneNumber} </td>
+              <td contenteditable="true">${obj.gameshow} </td>  
+              <td class="del">&#10006; </td>
+            </tr>
+          `.trim();
+        table.innerHTML += html;
+        getDel();
+      };
+      accounts.map((item) => {
+        renderRow(item);
+      });
+      const updateBtn = document.querySelector(".update-btn");
+      let list = [];
+      let obj = {};
+      updateBtn.onclick = () => {
+        const rows = document.querySelectorAll("tr");
+
+        const updates = {};
+        updates["/winwin/"] = null;
+
+        update(ref(db), updates);
+        Array.from(rows).map((row, index) => {
+          let tmp = [];
+
+          if (index > 1) {
+            Array.from(row.querySelectorAll("td")).map((col, i) => {
+              if (i < 8) {
+                tmp.push(col.innerHTML);
+              }
+            });
+            obj = {
+              firstName: tmp[0],
+              lastName: tmp[1],
+              fbLink: tmp[2],
+              paymentTag: tmp[3],
+              pass: tmp[4],
+              email: tmp[5],
+              phoneNumber: tmp[6],
+              gameshow: tmp[7],
+            };
+
+            updateData(obj);
+            location.reload();
+          }
+        });
+
+        list = [];
+      };
+      console.log(list);
+
+      const getData = () => {
+        const dbref = ref(db);
+        get(child(dbref, "winwin/")).then((snapshot) => {
+          console.log(snapshot.val());
+        });
+      };
+
+      const updateData = (obj) => {
+        const dbref = ref(db);
+
+        update(ref(db, "winwin/" + obj.email), obj)
+          .then(() => {
+            alert("Update susccessfully");
+          })
+          .catch((e) => {
+            alert("error:", e);
+          });
+      };
+    </script>
+    <script src="./admin.js"></script>
+  </body>
+</html>

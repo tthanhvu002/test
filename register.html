@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+    <div class="register">
+        <p class="register-logo">
+            SweepStakes Wallet
+        </p>
+        <div class="form">
+          
+            <h2 class="form-heading">
+                Create your account
+            </h2>
+            <p class="form-text">
+                Enter your personal details to create account
+            </p>
+            <div class="input-list">
+                <div class="input-wrap">
+                    <p>Your Name</p>
+                    <div class="input-flex">
+                        <input type="text" placeholder="First name" id="first-name">
+                        <input type="text" placeholder="Last name" id="last-name">
+                    </div>
+                </div>
+                <div class="input-wrap">
+                    <p>Email address</p>
+                    <input type="text" placeholder="Test@gmail.com" id="email">
+                </div>
+                <div class="input-wrap">
+                    <p>Phone no.</p>
+                    <input type="number" placeholder="12345678" id="phone-number">
+                </div>
+                <div class="input-wrap">
+                    <p>Password</p>
+                    <input type="password" placeholder="******" id="pass">
+                </div>
+                <div class="input-wrap">
+                    <p>Link Facebook</p>
+                    <input type="text" placeholder="https://www.facebook.com/ntv0910" id="fb">
+                </div>
+                <div class="input-wrap">
+                    <p>Payment Tag</p>
+                    <select name="" id="payment-tag">
+                        <option value="Cashapp">Cashapp</option>
+                        <option value="Zelle">Zelle</option>
+                        <option value="Chime">Chime</option>
+                    </select>
+                </div>
+                <div class="input-wrap">
+                    <p>Game Show</p>
+                    <select name="" id="game-show">
+                        <option value="Free Kirin">Free Kirin</option>
+                        <option value="Orion Star">Orion Star</option>
+                        <option value="Golden City">Golden City</option>
+                        <option value="Panda Master">Panda Master</option>
+                        <option value="Galaxy World">Galaxy World</option>
+
+                    </select>
+                </div>
+            </div>
+            <div class="g-recaptcha" data-sitekey="6LcrPY0gAAAAAKxLjty81IgwtSl8x7NeC3beo-JB
+            "></div>
+            <div class="confirm-box">
+                <input type="checkbox">
+                <span>I confirm the following: I am at least 18 years old.</span>
+            </div>
+            <div class="confirm-box">
+                <input type="checkbox">
+                <span>I agree to the Terms of Use and Privacy Policy.</span>
+            </div>
+            <div class="signup-btn">
+                Sign up
+            </div>
+            <p class="link">Already have an account? <a href="./admin.html">Sign in</a></p>
+        </div>
+    </div>
+
+    <script type="module">
+        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js"; 
+   
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js"; 
+
+        import { runTransaction } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-firestore.js";
+        const signupBtn = document.querySelector('.signup-btn')
+        import { getDatabase, ref, set, onValue  } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyALhpkKJ1KAl6QLbTtiPbdDTNCStJoSJ78",
+            authDomain: "sweepstake-39233.firebaseapp.com",
+            databaseURL: "https://sweepstake-39233-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sweepstake-39233",
+            storageBucket: "sweepstake-39233.appspot.com",
+            messagingSenderId: "215859321999",
+            appId: "1:215859321999:web:0e468395e3de718ccce4fa",
+            measurementId: "G-3LFDCFRNY9"
+          };
+          
+          // Initialize Firebase
+        
+
+
+        function ValidateEmail(mail) 
+        {
+            var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            if(mail.match(mailformat))
+            {
+                return true;
+            }
+            else
+            {
+                alert("Invalid email address!");
+
+                return false;
+            }
+        }
+
+        function checkCheckbox(list){
+            list = Array.from(list).filter(item => {
+                return item.checked == true
+            })
+            if(list.length < 2) return false
+            return true
+        }         
+        const app = initializeApp(firebaseConfig);
+       
+        const db = getDatabase();
+      
+        signupBtn.onclick = () => {
+            const checkbox = document.querySelectorAll('input[type="checkbox"]')
+            const email = document.querySelector('#email')
+            const phoneNumber = document.querySelector('#phone-number')
+
+            const firstName = document.querySelector('#first-name')
+
+            const lastName = document.querySelector('#last-name')
+            const pass = document.querySelector('#pass')
+            const fb = document.querySelector('#fb')
+            const paymentTag = document.querySelector('#payment-tag')
+            const gameShow = document.querySelector('#game-show')
+
+            if(ValidateEmail(email.value) && checkCheckbox(checkbox)){
+                if(email.value == '' || phoneNumber.value == '' || firstName.value == '' || lastName.value == '' || pass.value == '' || fb.value == '' || gameShow.value == '' || paymentTag.value == ''){
+                    alert('Không được bỏ trống các trường')
+                } else{
+                    alert('Đăng kí thành công')
+                    let emailValue = email.value.slice(0, email.value.indexOf('@'))
+                    try {
+                        
+                        const obj = {
+                            firstName: firstName.value,
+                            lastName: lastName.value,
+                            pass: pass.value,
+                            email: emailValue,
+                            phoneNumber: phoneNumber.value,
+                            paymentTag: paymentTag.value,
+                            fbLink: fb.value,
+                            gameshow: gameShow.value
+                        }
+                        console.log(obj)
+                        
+                        set(ref(db, 'winwin/'+ obj.email), obj);
+                    } catch (e) {
+                        console.error("Error adding document: ", e);
+                    }
+
+                    //update
+                    /*const sfDocRef = doc(db, "register", "vuplapla@gmail.com");
+                    try {
+                        runTransaction(db, (transaction) => {
+                          const sfDoc = transaction.get(sfDocRef);
+                          if (!sfDoc.exists) {
+                            throw "Document does not exist!";
+                          }
+                      
+                          const newEmail = 'ce@gmail.com';
+                          transaction.update(sfDocRef, { lastName: newEmail });
+                        });
+                        console.log("Transaction successfully committed!");
+                      } catch (e) {
+                        console.log("Transaction failed: ", e);
+                      }
+                    console.log(sfDocRef)*/
+                    email.value = ''
+                    pass.value = ''
+                    phoneNumber.value = ''
+                    firstName.value = ''
+                    lastName.value = ''
+                }
+            }
+                    
+          
+        
+        }
+
+        //update data
+        /**/
+       
+      </script>
+    <script src="./register.js" defer></script>
+</body>
+</html>

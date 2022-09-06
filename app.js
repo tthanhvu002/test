@@ -6,6 +6,7 @@ Array.from(menus).map((item) => {
     Array.from(menus).map((i) => {
       if (!i.isSameNode(item)) {
         i.classList.add("opacity-0");
+        document.querySelector('.register-btn').classList.add('opacity-0')
       }
     });
   };
@@ -16,9 +17,11 @@ Array.from(menus).map((item) => {
       // Clicked outside the box
 
       Array.from(menus).map(i => {
-          i.classList.remove("opacity-0")
+        
+        i.classList.remove("opacity-0")
         
       })
+      document.querySelector('.register-btn').classList.remove('opacity-0')
       item.querySelector(".sub-menu").classList.remove("active");
     }
   });

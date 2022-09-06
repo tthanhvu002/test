@@ -566,11 +566,14 @@ ul{
         
     }
     .sub-menu{
-        left: -50%;
+        border: none;
+        left: -60%;
         z-index: 99;
-        top: -150%;
         background-color: #000;
         
+    }
+    .menu li{
+        position: unset;
     }
     .sub-menu.active{
         width: 200px;
